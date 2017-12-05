@@ -63,7 +63,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
             <p><a href="http://events.linuxfoundation.org">events.linuxfoundation.org</a></p>
           </section>
           <section>
-            <h3>October 2017 events in Prague"</h3>
+            <h3>October 2017 events in Prague</h3>
             <ul>
               <li>Open Source Summit Europe</li>
               <li>Embedded Linux Conference Europe</li>
@@ -77,9 +77,10 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
             </ul>
           </section>
           <section>
+            <h3>If you weren't there...</h3>
             <ul>
-              <li>elinux.org archive</li>
-              <li>Linus talk</li>
+              <li><a href="https://elinux.org/Category:ELCE">elinux.org presentations archive</a></li>
+              <li><a href="https://www.youtube.com/watch?v=NLQZzEvavGs">Linus talk on YouTube</a></li>
             </ul>
           </section>
           <section>
@@ -194,6 +195,13 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
               <li>or... build own image!</li>
             </ul>
           </section>
+          <section>
+            <pre><code class="hljs" data-trim contenteditable>
+$ wget https://downloads.raspberrypi.org/raspbian_latest
+
+$ pv sdcard.img | dd of=/dev/sdb bs=4M oflag=dsync
+            </code></pre>
+          </section>
         </section>
 
         <section>
@@ -212,7 +220,21 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
             </ul>
           </section>
           <section>
-            <h2>Embedded Linux Customization</h2>
+            <h3>Buildroot is the best!</h3>
+            <img src="https://buildroot.org/images/logo.png" />
+          </section>
+          <section>
+            <pre><code class="hljs" data-trim contenteditable>
+$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install make gcc g++ libncurses-dev unzip git patch python rsync bc bzip2
+$ wget https://buildroot.org/downloads/buildroot-2017.02.8.tar.gz
+$ tar -zxf buildroot-2017.02.8.tar.gz
+$ cd buildroot-2017.02.8/
+$ make raspberrypi_defconfig
+$ make
+$ ls output/images/sdcard.img
+            </code></pre>
           </section>
         </section>
 
@@ -246,6 +268,16 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
           </section>
           <section>
             <pre><code class="hljs" data-trim contenteditable>
+$ sudo apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+$ curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo apt-key add -
+$ sudo apt-key fingerprint 0EBFCD88
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
+$ sudo apt update
+$ sudo apt install docker-ce
+            </code></pre>
+          </section>
+          <section>
+            <pre><code class="hljs" data-trim contenteditable>
 $ docker pull apline
 $ docker images
 $ docker run alpine ls -l
@@ -258,15 +290,19 @@ $ docker run -it alpine /bin/sh
           <section>
             <h2>Building Linux Containers</h2>
           </section>
-
           <section>
             <pre><code class="hljs" data-trim contenteditable>
-$
+$ cd output/images
+$ mkdir extra extra/etc extra/sbin extra/lib extra/lib64
+$ touch extra/etc/resolv.conf
+$ touch extra/sbin/init
+$ cp /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libc.so.6 extra/lib
+$ cp /lib64/ld-linux-x86-64.so.2 extra/lib64
+$ cp rootfs.tar fixup.tar
+$ tar rvf fixup.tar -C extra .
+$ docker import - basic-system < fixup.tar
+$ docker run -t -i basic-system /bin/sh
             </code></pre>
-          </section>
-
-          <section>
-            <h2>Linux Containers Customization</h2>
           </section>
         </section>
 
